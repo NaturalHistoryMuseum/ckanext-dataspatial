@@ -23,17 +23,21 @@ class DataSpatialPlugin(p.SingletonPlugin):
     # IConfigurable
     def configure(self, ckan_config):
         prefix = 'dataspatial.'
-        config_items = ['solr.field', 'postgis.field', 'postgis.mercator_field']
-        bool_config_items = ['use_datasolr']
+        config_items = config.keys()
         for long_name in ckan_config:
             if not long_name.startswith(prefix):
                 continue
             name = long_name[len(prefix):]
             if name in config_items:
                 config[name] = ckan_config[long_name]
-            elif name in bool_config_items:
-                config[name] = ckan_config[long_name].lower() in ['yes', 'ok', 'true', '1']
-
+            else:
+                raise p.toolkit.ValidationError({
+                    long_name: 'Unknown configuration setting'
+                })
+        if config['query_extent'] not in ['postgis', 'solr']:
+            raise p.toolkit.ValidationError({
+                'dataspatial.query_extent': 'Should be either of postgis or solr'
+            })
 
     # IActions
     def get_actions(self):
@@ -85,15 +89,20 @@ class DataSpatialPlugin(p.SingletonPlugin):
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
         return query_dict
 
-    # IDataSolr
-    def datasolr_validate(self, context, data_dict, field_types):
-        """ Validates the input request.
+    ## IDataSolr
+    def datasolr_validate(self, context, data_dict, fields_types):
+        return self.datastore_validate(context, data_dict, fields_types)
 
-        This is the main validator, which will remove all known fields
-        from fields, sort, q as well as all other accepted input parameters.
-        """
-        return data_dict
+    def datasolr_search(self, context, data_dict, fields_types, query_dict):
+        try:
+            tmgeom = data_dict['filters']['_tmgeom']
+        except KeyError:
+            return query_dict
+        field_name = config['solr.index_field']
+        for geom in tmgeom:
+            query_dict['q'][0].append(
+                '{}:"Intersects({{}}) distErrPct=0"'.format(field_name)
+            )
+            query_dict['q'][1].append(geom)
 
-    def datasolr_search(self, context, data_dict, field_types, query_dict):
-        """ Build the solr search """
-        return dict(query_dict.items() + solr_args.items())
+        return query_dict

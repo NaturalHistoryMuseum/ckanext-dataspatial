@@ -12,7 +12,7 @@ Ckan Datastore Spatial extension
 Usage
 -----
 
-When using PostGis, you will need to create PostGis columns on your dataset. There are actions and commands provided to do this for you, however you will need to embed those within your worklow. When using Solr, you will need to make sure the spatial data is indexed. It is up to you to manage this. Geospatial searches and query extent work both with PostGis and Solr - to use Solr you will need to install and configure the [datasolr](http://github.com/NaturalHistoryMuseum/ckanext-datasolr) extension for the datasets you wish to use Solr on. 
+When using PostGis, you will need to create PostGis columns on your dataset. There are actions and commands provided to do this for you, however you will need to embed those within your workflow. When using Solr, you will need to make sure the spatial data is indexed. It is up to you to manage this. Geospatial searches and query extent work both with PostGis and Solr - to use Solr you will need to install and configure the [datasolr](http://github.com/NaturalHistoryMuseum/ckanext-datasolr) extension for the datasets you wish to use Solr on. 
 
 ### Create geospatial column on a PostGIS dataset
 
@@ -117,12 +117,9 @@ Configuration
 -------------
 
 ```ini
-# If True, the query_extent action will use a solr spatial query, rather
-# than an SQL query. This requires datasolr to be enabled. Defaults to False.
-dataspatial.use_datasolr = False
-
-# The name of the spatial field in Solr. Defaults to _geom
-dataspatial.datasolr.field = _geom
+# Indicate whether query_extent queries should use the postgis or solr backend.
+# Should be either 'postgis' (the default) or 'solr'
+dataspatial.query_extent = postgis
 
 # Name of the geospatial columns in the PostGIS database. postgis.field
 # represents the WGS data, while postgis.mercator_field the
@@ -130,6 +127,17 @@ dataspatial.datasolr.field = _geom
 # The defaults are, respectively, _geom and _the_geom_webmercator
 dataspatial.postgis.field = _geom
 dataspatial.postgis.mercator_field = _the_geom_webmercator
+
+# If datasolr is enabled, ckanext-spatial will provide geospatial search using
+# solr. For this, specify the name of the spatial index in Solr. 
+# Defaults to _geom
+dataspatial.solr.index_field = _geom
+
+# Name of the solr index for the longitude and latitude fields (If using solr 
+# query extent, the lat/long field must be indexed as well as the spatial 
+# index.) Default to, respectively, latitude and longitude
+dataspatial.solr.latitude_field = latitude
+dataspatial.solr.longitude_field = longitude
 ```
 
 Postgis
