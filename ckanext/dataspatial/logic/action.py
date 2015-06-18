@@ -37,7 +37,7 @@ def create_geom_columns(context, data_dict):
     else:
         index = True
 
-    with get_connection() as connection:
+    with get_connection(write=True) as connection:
         create_postgis_columns(resource_id, connection)
         if index:
             create_postgis_index(resource_id, connection)
