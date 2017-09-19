@@ -18,7 +18,7 @@ def datastore_query_extent(context, data_dict):
     @param context: Current context
     @data_dict: Request arguments, as per datastore_search
     """
-    if config['query_extent'] == 'solr':
-        return solr_query_extent(data_dict)
-    else:
-        return postgis_query_extent(data_dict)
+    # if config['query_extent'] == 'solr':
+    #     return solr_query_extent(data_dict)
+    # else:
+    return postgis_query_extent(data_dict)

@@ -26,15 +26,16 @@ def query_extent(data_dict):
     data_dict['offset'] = 0
     data_dict['limit'] = 1
     data_dict['fields'] = ['_id']
-    r = toolkit.get_action('datastore_solr_search')({}, data_dict)
+    r = toolkit.get_action('datastore_search')({}, data_dict)
     if r['total'] == 0:
         return result
     result['total_count'] = r['total']
-    data_dict['solr_stats_fields'] = [lat_field, long_field]
+    # data_dict['solr_stats_fields'] = [lat_field, long_field]
     if 'filters' not in data_dict:
         data_dict['filters'] = {}
-    data_dict['filters']['_solr_not_empty'] = [lat_field, long_field]
-    r = toolkit.get_action('datastore_solr_search')({}, data_dict)
+    # data_dict['filters']['_solr_not_empty'] = [lat_field, long_field]
+
+    r = toolkit.get_action('datastore_search')({}, data_dict)
     if r['total'] == 0:
         return result
     result['geom_count'] = r['total']
