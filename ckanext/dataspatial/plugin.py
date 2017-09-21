@@ -94,15 +94,20 @@ class DataSpatialPlugin(p.SingletonPlugin):
         return self.datastore_validate(context, data_dict, fields_types)
 
     def datasolr_search(self, context, data_dict, fields_types, query_dict):
-        try:
-            tmgeom = data_dict['filters']['_tmgeom']
-        except KeyError:
-            return query_dict
-        field_name = config['solr.index_field']
-        for geom in tmgeom:
-            query_dict['q'][0].append(
-                '{}:"Intersects({{}}) distErrPct=0"'.format(field_name)
-            )
-            query_dict['q'][1].append(geom)
+
+        # FIXME: Remove _tmgeom search
+        if 'filters' in query_dict and query_dict['filters']:
+            query_dict['filters'].pop("_tmgeom", None)
+
+        # try:
+        #     tmgeom = data_dict['filters']['_tmgeom']
+        # except KeyError:
+        #     return query_dict
+        # field_name = config['solr.index_field']
+        # for geom in tmgeom:
+        #     query_dict['q'][0].append(
+        #         '{}:"Intersects({{}}) distErrPct=0"'.format(field_name)
+        #     )
+        #     query_dict['q'][1].append(geom)
 
         return query_dict
