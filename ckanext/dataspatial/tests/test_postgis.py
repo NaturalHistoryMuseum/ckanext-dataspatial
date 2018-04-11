@@ -5,10 +5,9 @@
 # Created by the Natural History Museum in London, UK
 
 import ckanext.dataspatial.lib.postgis as pgs
-
-from mock import patch
 from ckanext.dataspatial.config import config
-from nose.tools import assert_true, assert_equals
+from mock import patch
+from nose.tools import assert_equals, assert_true
 
 
 class TestPostGIS(object):
@@ -17,6 +16,7 @@ class TestPostGIS(object):
 
 
     '''
+
     def setup(self):
         ''' '''
         config[u'postgis.field'] = u'the_field'
@@ -35,10 +35,10 @@ class TestPostGIS(object):
         assert_equals(cgo.call_count, 2)
         assert_equals(cgo.call_args_list[0][0][1:], (
             u'a_resource', u'the_field', 4326
-        ))
+            ))
         assert_equals(cgo.call_args_list[1][0][1:], (
             u'a_resource', u'the_mercator', 3857
-        ))
+            ))
 
     @patch(u'ckanext.dataspatial.lib.postgis.create_index')
     @patch(u'ckanext.dataspatial.lib.postgis.get_connection')
@@ -53,11 +53,10 @@ class TestPostGIS(object):
         assert_equals(ci.call_count, 2)
         assert_equals(ci.call_args_list[0][0][1:], (
             u'a_resource', u'the_field'
-        ))
+            ))
         assert_equals(ci.call_args_list[1][0][1:], (
             u'a_resource', u'the_mercator'
-        ))
-
+            ))
 
     @patch(u'ckanext.dataspatial.lib.postgis.fields_exist')
     @patch(u'ckanext.dataspatial.lib.postgis.get_connection')
@@ -74,8 +73,7 @@ class TestPostGIS(object):
         assert_equals(fe.call_count, 1)
         assert_equals(fe.call_args_list[0][0][1:], (
             u'a_resource', [u'the_field', u'the_mercator']
-        ))
-
+            ))
 
     @patch(u'ckanext.dataspatial.lib.postgis.has_postgis_columns')
     @patch(u'ckanext.dataspatial.lib.postgis.index_exists')
@@ -95,7 +93,7 @@ class TestPostGIS(object):
         assert_equals(ie.call_count, 2)
         assert_equals(ie.call_args_list[0][0][1:], (
             u'a_resource', u'the_field'
-        ))
+            ))
         assert_equals(ie.call_args_list[1][0][1:], (
             u'a_resource', u'the_mercator'
-        ))
+            ))
