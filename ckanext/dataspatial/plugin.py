@@ -1,3 +1,9 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-dataspatial
+# Created by the Natural History Museum in London, UK
+
 import ckan.plugins as p
 import re
 
@@ -12,6 +18,7 @@ except ImportError:
 
 
 class DataSpatialPlugin(p.SingletonPlugin):
+    ''' '''
     p.implements(p.interfaces.IConfigurable)
     p.implements(p.interfaces.IActions)
     p.implements(IDatastore)
@@ -22,7 +29,12 @@ class DataSpatialPlugin(p.SingletonPlugin):
 
     # IConfigurable
     def configure(self, ckan_config):
-        prefix = 'dataspatial.'
+        '''
+
+        :param ckan_config: 
+
+        '''
+        prefix = u'dataspatial.'
         config_items = config.keys()
         for long_name in ckan_config:
             if not long_name.startswith(prefix):
@@ -32,36 +44,44 @@ class DataSpatialPlugin(p.SingletonPlugin):
                 config[name] = ckan_config[long_name]
             else:
                 raise p.toolkit.ValidationError({
-                    long_name: 'Unknown configuration setting'
+                    long_name: u'Unknown configuration setting'
                 })
-        if config['query_extent'] not in ['postgis', 'solr']:
+        if config[u'query_extent'] not in [u'postgis', u'solr']:
             raise p.toolkit.ValidationError({
-                'dataspatial.query_extent': 'Should be either of postgis or solr'
+                u'dataspatial.query_extent': u'Should be either of postgis or solr'
             })
 
     # IActions
     def get_actions(self):
+        ''' '''
         return {
-            'create_geom_columns': create_geom_columns,
-            'update_geom_columns': update_geom_columns,
-            'datastore_query_extent': datastore_query_extent
+            u'create_geom_columns': create_geom_columns,
+            u'update_geom_columns': update_geom_columns,
+            u'datastore_query_extent': datastore_query_extent
         }
 
     # IDatastore
     def datastore_validate(self, context, data_dict, all_field_ids):
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param all_field_ids: 
+
+        '''
         # Validate geom fields
-        if 'fields' in data_dict:
-            geom_fields = [config['postgis.field'], config['postgis.mercator_field']]
-            data_dict['fields'] = [f for f in data_dict['fields'] if f not in geom_fields]
+        if u'fields' in data_dict:
+            geom_fields = [config[u'postgis.field'], config[u'postgis.mercator_field']]
+            data_dict[u'fields'] = [f for f in data_dict[u'fields'] if f not in geom_fields]
         # Validate geom filters
         try:
             # We'll just check that this *looks* like a WKT, in which case we will trust 
             # it's valid. Worst case the query will fail, which is handled gracefully anyway.
-            for i, v in enumerate(data_dict['filters']['_tmgeom']):
-                if re.search('^\s*(POLYGON|MULTIPOLYGON)\s*\([-+0-9,(). ]+\)\s*$', v):
-                    del data_dict['filters']['_tmgeom'][i]
-            if len(data_dict['filters']['_tmgeom']) == 0:
-                del data_dict['filters']['_tmgeom']
+            for i, v in enumerate(data_dict[u'filters'][u'_tmgeom']):
+                if re.search(u'^\s*(POLYGON|MULTIPOLYGON)\s*\([-+0-9,(). ]+\)\s*$', v):
+                    del data_dict[u'filters'][u'_tmgeom'][i]
+            if len(data_dict[u'filters'][u'_tmgeom']) == 0:
+                del data_dict[u'filters'][u'_tmgeom']
         except KeyError:
             pass
         except TypeError:
@@ -70,34 +90,65 @@ class DataSpatialPlugin(p.SingletonPlugin):
         return data_dict
 
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param all_field_ids: 
+        :param query_dict: 
+
+        '''
         try:
-            tmgeom = data_dict['filters']['_tmgeom']
+            tmgeom = data_dict[u'filters'][u'_tmgeom']
         except KeyError:
             return query_dict
 
         clauses = []
-        field_name = config['postgis.field']
+        field_name = config[u'postgis.field']
         for geom in tmgeom:
             clauses.append((
-                "ST_Intersects(\"{field}\", ST_GeomFromText(%s, 4326))".format(field=field_name),
+                u'ST_Intersects(\"{field}\", ST_GeomFromText(%s, 4326))'.format(field=field_name),
                 geom
             ))
 
-        query_dict['where'] += clauses
+        query_dict[u'where'] += clauses
         return query_dict
 
     def datastore_delete(self, context, data_dict, all_field_ids, query_dict):
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param all_field_ids: 
+        :param query_dict: 
+
+        '''
         return query_dict
 
     ## IDataSolr
     def datasolr_validate(self, context, data_dict, fields_types):
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param fields_types: 
+
+        '''
         return self.datastore_validate(context, data_dict, fields_types)
 
     def datasolr_search(self, context, data_dict, fields_types, query_dict):
+        '''
+
+        :param context: 
+        :param data_dict: 
+        :param fields_types: 
+        :param query_dict: 
+
+        '''
 
         # FIXME: Remove _tmgeom search
-        if 'filters' in query_dict and query_dict['filters']:
-            query_dict['filters'].pop("_tmgeom", None)
+        if u'filters' in query_dict and query_dict[u'filters']:
+            query_dict[u'filters'].pop(u'_tmgeom', None)
 
         # try:
         #     tmgeom = data_dict['filters']['_tmgeom']
