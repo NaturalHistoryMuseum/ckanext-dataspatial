@@ -1,6 +1,8 @@
 Ckan Datastore Spatial extension
 ================================
 
+[![Travis branch](https://img.shields.io/travis/NaturalHistoryMuseum/ckanext-dataspatial/master.svg?style=flat-square)](https://travis-ci.org/NaturalHistoryMuseum/ckanext-dataspatial) [![Coveralls github branch](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-dataspatial/master.svg?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-dataspatial)
+
 *dataspatial* is a [Ckan](http://ckan.org) extension to provide geospatial awareness of datastore data. This includes:
 
 - Geospatial searches within datasets;
