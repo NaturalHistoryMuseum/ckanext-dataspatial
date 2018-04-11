@@ -4,9 +4,7 @@
 # This file is part of ckanext-dataspatial
 # Created by the Natural History Museum in London, UK
 
-from ckanext.dataspatial.config import config
 from ckanext.dataspatial.lib.postgis import query_extent as postgis_query_extent
-from ckanext.dataspatial.lib.solr import query_extent as solr_query_extent
 
 
 def datastore_query_extent(context, data_dict):
@@ -22,11 +20,8 @@ def datastore_query_extent(context, data_dict):
     }
 
     :param context: Current context
-    @data_dict: Request arguments, as per datastore_search
-    :param data_dict: 
+    :param data_dict: Request arguments, as per datastore_search
 
     '''
-    # if config['query_extent'] == 'solr':
-    #     return solr_query_extent(data_dict)
-    # else:
+
     return postgis_query_extent(data_dict)

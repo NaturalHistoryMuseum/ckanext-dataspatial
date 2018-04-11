@@ -5,8 +5,10 @@
 # Created by the Natural History Museum in London, UK
 
 import copy
-from ckan.plugins import toolkit
+
 from ckanext.dataspatial.config import config
+
+from ckan.plugins import toolkit
 
 
 def query_extent(data_dict):
@@ -28,7 +30,7 @@ def query_extent(data_dict):
         u'total_count': 0,
         u'geom_count': 0,
         u'bounds': None
-    }
+        }
     data_dict = copy.deepcopy(data_dict)
     data_dict[u'offset'] = 0
     data_dict[u'limit'] = 1
@@ -56,5 +58,5 @@ def query_extent(data_dict):
             bounds[1][1] = field_def[u'max']
     result[u'bounds'] = (
         tuple(bounds[0]), tuple(bounds[1])
-    )
+        )
     return result

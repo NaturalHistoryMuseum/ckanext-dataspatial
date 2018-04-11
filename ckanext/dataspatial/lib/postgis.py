@@ -4,13 +4,12 @@
 # This file is part of ckanext-dataspatial
 # Created by the Natural History Museum in London, UK
 
-import ckan.plugins.toolkit as toolkit
-
 from ckanext.dataspatial.config import config
-from ckanext.dataspatial.db import get_connection, create_index, index_exists
-from ckanext.dataspatial.db import fields_exist, create_geom_column
-from ckanext.dataspatial.db import invoke_search_plugins
+from ckanext.dataspatial.db import (create_geom_column, create_index, fields_exist,
+                                    get_connection, index_exists, invoke_search_plugins)
 from ckanext.datastore import db as datastore_db
+
+from ckan.plugins import toolkit
 from ckanext.datastore.helpers import is_single_statement
 
 
@@ -109,9 +108,11 @@ def populate_postgis_columns(resource_id, lat_field, long_field,
     field = config[u'postgis.field']
 
     with get_connection(connection, write=True, raw=True) as c:
-        # This is timing out for big datasets (KE EMu), so we're going to break into a batch operation
+        # This is timing out for big datasets (KE EMu), so we're going to break into a
+        #  batch operation
         # We need two cursors, one for reading; one for writing
-        # And the write cursor will be committed every x number of times (incremental_commit_size)
+        # And the write cursor will be committed every x number of times (
+        # incremental_commit_size)
         read_cursor = c.cursor()
         write_cursor = c.cursor()
 
@@ -121,18 +122,21 @@ def populate_postgis_columns(resource_id, lat_field, long_field,
         read_sql = u'''
           SELECT _id
           FROM "{resource_id}"
-          WHERE "{lat_field}" <= 90 AND "{lat_field}" >= -90 AND "{long_field}" <= 180 AND "{long_field}" >= -180
+          WHERE "{lat_field}" <= 90 AND "{lat_field}" >= -90 AND "{long_field}" <= 180 
+          AND "{long_field}" >= -180
             AND (
-              ("{geom_field}" IS NULL AND "{lat_field}" IS NOT NULL OR ST_Y("{geom_field}") <> "{lat_field}")
+              ("{geom_field}" IS NULL AND "{lat_field}" IS NOT NULL OR ST_Y("{
+              geom_field}") <> "{lat_field}")
               OR
-              ("{geom_field}" IS NULL AND "{long_field}" IS NOT NULL OR ST_X("{geom_field}") <> "{long_field}")
+              ("{geom_field}" IS NULL AND "{long_field}" IS NOT NULL OR ST_X("{
+              geom_field}") <> "{long_field}")
             )
          '''.format(
             resource_id=resource_id,
             geom_field=field,
             long_field=long_field,
             lat_field=lat_field
-        )
+            )
 
         read_cursor.execute(read_sql)
 
@@ -141,8 +145,10 @@ def populate_postgis_columns(resource_id, lat_field, long_field,
 
         sql = u'''
           UPDATE "{resource_id}"
-          SET "{geom_field}" = st_setsrid(st_makepoint("{long_field}"::float8, "{lat_field}"::float8), 4326),
-              "{mercator_field}" = st_transform(st_setsrid(st_makepoint("{long_field}"::float8, "{lat_field}"::float8), 4326), 3857)
+          SET "{geom_field}" = st_setsrid(st_makepoint("{long_field}"::float8, 
+          "{lat_field}"::float8), 4326),
+              "{mercator_field}" = st_transform(st_setsrid(st_makepoint("{
+              long_field}"::float8, "{lat_field}"::float8), 4326), 3857)
           WHERE _id = %s
          '''.format(
             resource_id=resource_id,
@@ -150,7 +156,7 @@ def populate_postgis_columns(resource_id, lat_field, long_field,
             geom_field=field,
             long_field=long_field,
             lat_field=lat_field
-        )
+            )
 
         while True:
             output = read_cursor.fetchmany(incremental_commit_size)
@@ -159,9 +165,9 @@ def populate_postgis_columns(resource_id, lat_field, long_field,
 
             for row in output:
                 count += 1
-                write_cursor.execute(sql,([row[0]]))
+                write_cursor.execute(sql, ([row[0]]))
 
-            #commit, invoked every incremental commit size
+            # commit, invoked every incremental commit size
             c.commit()
             if progress:
                 progress(count)
@@ -188,11 +194,11 @@ def query_extent(data_dict, connection=None):
             u'total_count': 0,
             u'geom_count': 0,
             u'bounds': None
-        }
+            }
     result = {
         u'total_count': r[u'total'],
         u'bounds': None
-    }
+        }
     field_types = dict([(f[u'id'], f[u'type']) for f in r[u'fields']])
     field_types[u'_id'] = u'int'
     # Call plugin to obtain correct where statement
@@ -214,11 +220,11 @@ def query_extent(data_dict, connection=None):
         resource_id=data_dict[u'resource_id'],
         where_clause=where_clause,
         ts_query=ts_query
-    )
+        )
     if not is_single_statement(query):
         raise datastore_db.ValidationError({
             u'query': [u'Query is not a single statement.']
-        })
+            })
     with get_connection(connection) as c:
         query_result = c.execute(query, values)
         r = query_result.fetchone()

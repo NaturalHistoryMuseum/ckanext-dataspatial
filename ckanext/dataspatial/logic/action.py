@@ -4,15 +4,12 @@
 # This file is part of ckanext-dataspatial
 # Created by the Natural History Museum in London, UK
 
-import ckan.plugins.toolkit as toolkit
-
-from ckanext.dataspatial.config import config
-from ckanext.dataspatial.lib.postgis import create_postgis_columns
-from ckanext.dataspatial.lib.postgis import create_postgis_index
-from ckanext.dataspatial.lib.postgis import populate_postgis_columns
-from ckanext.dataspatial.lib.postgis import query_extent as postgis_query_extent
-from ckanext.dataspatial.lib.solr import query_extent as solr_query_extent
 from ckanext.dataspatial.db import get_connection
+from ckanext.dataspatial.lib.postgis import (create_postgis_columns,
+                                             create_postgis_index,
+                                             populate_postgis_columns)
+
+from ckan.plugins import toolkit
 
 
 def create_geom_columns(context, data_dict):
@@ -21,8 +18,10 @@ def create_geom_columns(context, data_dict):
     :param context: Current context
     :param data_dict: Parameters:
       - resource_id: The resource for which to create geom columns; REQUIRED
-      - latitude_field: The existing latitude field in the column, optional unless populate is true
-      - longitude_field: The existing longitude field in the column, optional unless populate is true
+      - latitude_field: The existing latitude field in the column, optional unless
+      populate is true
+      - longitude_field: The existing longitude field in the column, optional unless
+      populate is true
       - populate: If true then pre-populate the geom fields using the latitude
                   and longitude fields. Defaults to true.
       - index: If true then create an index on the created columns.
@@ -34,7 +33,7 @@ def create_geom_columns(context, data_dict):
     except KeyError:
         raise toolkit.ValidationError({
             u'resource_id': u'A Resource id is required'
-        })
+            })
     if u'populate' in data_dict:
         populate = data_dict[u'populate']
     else:
@@ -71,4 +70,3 @@ def update_geom_columns(context, data_dict):
         raise toolkit.ValidationError(u'Missing required field')
 
     populate_postgis_columns(resource_id, lat_field, long_field)
-
