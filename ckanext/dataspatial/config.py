@@ -11,4 +11,4 @@ config = {
     u'solr.index_field': u'_geom',
     u'solr.latitude_field': u'latitude',
     u'solr.longitude_field': u'longitude'
-}
+    }

@@ -4,14 +4,13 @@
 # This file is part of ckanext-dataspatial
 # Created by the Natural History Museum in London, UK
 
-import ckan.plugins as plugins
-import sqlalchemy.sql as sql
-
-from ckanext.datastore import interfaces
 from contextlib import contextmanager
-from pylons import config
-from sqlalchemy import create_engine, text
+
+from ckanext.datastore.interfaces import IDatastore
+from sqlalchemy import create_engine, sql, text
 from sqlalchemy.pool import NullPool
+
+from ckan.plugins import PluginImplementations, toolkit
 
 _read_engine = None
 _write_engine = None
@@ -26,13 +25,15 @@ def get_engine(write=False):
     if write:
         global _write_engine
         if _write_engine is None:
-            # Write engine doesn't really need to keep connections open, as it happens quite rarely.
-            _write_engine = create_engine(config[u'ckan.datastore.write_url'], poolclass=NullPool)
+            # Write engine doesn't really need to keep connections open, as it happens
+            #  quite rarely.
+            _write_engine = create_engine(toolkit.config[u'ckan.datastore.write_url'],
+                                          poolclass=NullPool)
         return _write_engine
     else:
         global _read_engine
         if _read_engine is None:
-            _read_engine = create_engine(config[u'ckan.datastore.read_url'])
+            _read_engine = create_engine(toolkit.config[u'ckan.datastore.read_url'])
         return _read_engine
 
 
@@ -67,7 +68,7 @@ def _index_name(table, field, index_type):
     :param table: Table name
     :param field: Field name
     :param index_type: Index type
-    :returns: s: The index name
+    :returns:  The index name
 
     '''
     return u'{}_{}_{}'.format(table, field, index_type)
@@ -88,11 +89,11 @@ def create_index(connection, table, field, index_type=u'GIST'):
        USING {index_type}("{field}")
        WHERE "{field}" IS NOT NULL;
     '''.format(
-        index_name = _index_name(table, field, index_type),
+        index_name=_index_name(table, field, index_type),
         table=table,
         field=field,
         index_type=index_type
-    ))
+        ))
     connection.execute(s)
 
 
@@ -105,7 +106,7 @@ def index_exists(connection, table, field, type=u'GIST'):
     :param table: Table name
     :param field: Field name
     :param type: Index type (Default value = u'GIST')
-    :returns: s: True if the index exists, False otherwise.
+    :returns: True if the index exists, False otherwise.
 
     '''
     t = sql.table(u'pg_indexes')
@@ -122,7 +123,7 @@ def fields_exist(connection, table, fields):
     :param connection: Database connection
     :param table: Table to test
     :param fields: List of fields to look for
-    :returns: s: True if all the fields exist, false if not
+    :returns: True if all the fields exist, false if not
 
     '''
     s = sql.select(u'*', from_obj=sql.table(table)).limit(0)
@@ -131,6 +132,7 @@ def fields_exist(connection, table, fields):
     for field in fields:
         exists = exists and field in all_fields
     return exists
+
 
 def create_geom_column(connection, table, field, projection):
     '''Create a geospatial column on the given table
@@ -141,7 +143,8 @@ def create_geom_column(connection, table, field, projection):
     :param projection: The projection of the geom column
 
     '''
-    s = sql.select([sql.func.AddGeometryColumn(u'public', table, field, projection, u'POINT', 2)])
+    s = sql.select(
+        [sql.func.AddGeometryColumn(u'public', table, field, projection, u'POINT', 2)])
     connection.execute(s)
 
 
@@ -153,7 +156,7 @@ def invoke_search_plugins(data_dict, field_types):
 
     :param data_dict: The datastore_search request
     :param field_types: The field types, as a dict of field name to type name
-    :returns: s: A tuple defining (
+    :returns: A tuple defining (
             SQL 'from' statement for full text queries,
             where clause,
             list of replacement values
@@ -164,11 +167,11 @@ def invoke_search_plugins(data_dict, field_types):
         u'select': [],
         u'sort': [],
         u'where': []
-    }
-    for plugin in plugins.PluginImplementations(interfaces.IDatastore):
+        }
+    for plugin in PluginImplementations(IDatastore):
         query_dict = plugin.datastore_search(
             {}, data_dict, field_types, query_dict
-        )
+            )
     clauses = []
     values = []
     for clause_and_values in query_dict[u'where']:
