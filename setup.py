@@ -8,9 +8,6 @@ from setuptools import find_packages, setup
 
 __version__ = '0.2'
 
-with open(u'ckanext/dataspatial/version.py') as f:
-    exec (f.read())
-
 setup(
     name=u'ckanext-dataspatial',
     version=__version__,
