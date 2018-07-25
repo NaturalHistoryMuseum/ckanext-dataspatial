@@ -7,7 +7,7 @@
 from ckanext.dataspatial.config import config
 from ckanext.dataspatial.db import (create_geom_column, create_index, fields_exist,
                                     get_connection, index_exists, invoke_search_plugins)
-from ckanext.datastore import db as datastore_db
+from ckanext.datastore import backend as datastore_db
 
 from ckan.plugins import toolkit
 from ckanext.datastore.helpers import is_single_statement
