@@ -6,16 +6,37 @@
 
 from setuptools import find_packages, setup
 
-__version__ = '0.2'
+__version__ = u'1.0.0-alpha'
+
+with open(u'README.md', u'r') as f:
+    __long_description__ = f.read()
 
 setup(
     name=u'ckanext-dataspatial',
     version=__version__,
-    description=u'Ckan extension to provide geospatial awareness of datastore datasets',
-    url=u'http://github.com/NaturalHistoryMuseum/ckanext-dataspatial',
-    packages=find_packages(exclude=u'tests'),
-    entry_points=u'''
+    description=u'A CKAN extension that provides geospatial awareness of datastore data.',
+    long_description=__long_description__,
+    classifiers=[
+        u'Development Status :: 3 - Alpha',
+        u'Framework :: Flask',
+        u'Programming Language :: Python :: 2.7'
+    ],
+    keywords=u'CKAN data dataspatial',
+    author=u'Natural History Museum',
+    author_email=u'data@nhm.ac.uk',
+    url=u'https://github.com/NaturalHistoryMuseum/ckanext-dataspatial',
+    license=u'GNU GPLv3',
+    packages=find_packages(exclude=[u'tests']),
+    namespace_packages=[u'ckanext', u'ckanext.dataspatial'],
+    include_package_data=True,
+    zip_safe=False,
+    install_requires=[],
+    entry_points= \
+        u'''
         [ckan.plugins]
-            dataspatial = ckanext.dataspatial.plugin:DataSpatialPlugin
+            dataspatial=ckanext.dataspatial.plugin:DataSpatialPlugin
+
         [paste.paster_command]
-            dataspatial = ckanext.dataspatial.commands.dataspatial:DataSpatialCommand''')
+            dataspatial=ckanext.dataspatial.commands.dataspatial:DataSpatialCommand
+        ''',
+    )
