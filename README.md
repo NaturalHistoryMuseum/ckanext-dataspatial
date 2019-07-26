@@ -11,6 +11,8 @@ _A CKAN extension that provides geospatial awareness of datastore data._
 
 # Overview
 
+**NB**: This extension is _unmaintained_. There have been some syntax updates so it _should_ work with CKAN 2.8+, but it hasn't been tested and is not currently in use by the Museum.
+
 This extension provides geospatial awareness of datastore data. This includes:
 
 - Geospatial searches within datasets;
