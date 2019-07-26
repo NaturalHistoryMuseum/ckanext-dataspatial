@@ -4,7 +4,8 @@ python:
 # command to install dependencies
 install:
   - "pip install -e ."
+  - "pip install -r requirements.txt"
   - "pip install -r dev_requirements.txt"
 # command to run tests
-script: coverage run --source=ckanext-dataspatial setup.py nosetests
+script: coverage run --source=ckanext.dataspatial setup.py nosetests
 after_success: coveralls

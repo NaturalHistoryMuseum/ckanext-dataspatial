@@ -15,7 +15,7 @@ def query_extent(data_dict):
     '''Return the spatial query extent of a datastore search
 
     :param data_dict: Dictionary defining the search
-    :returns: s a dictionary defining:
+    :returns: a dictionary defining:
         {
             total_count: The total number of rows in the query,
             geom_count: The number of rows that have a geom,
@@ -39,10 +39,8 @@ def query_extent(data_dict):
     if r[u'total'] == 0:
         return result
     result[u'total_count'] = r[u'total']
-    # data_dict['solr_stats_fields'] = [lat_field, long_field]
     if u'filters' not in data_dict:
         data_dict[u'filters'] = {}
-    # data_dict['filters']['_solr_not_empty'] = [lat_field, long_field]
 
     r = toolkit.get_action(u'datastore_search')({}, data_dict)
     if r[u'total'] == 0:
