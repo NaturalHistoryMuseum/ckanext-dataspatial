@@ -2,6 +2,8 @@
 
 # ckanext-dataspatial
 
+## This extension is no longer maintained.
+
 [![Travis](https://img.shields.io/travis/NaturalHistoryMuseum/ckanext-dataspatial/master.svg?style=flat-square)](https://travis-ci.org/NaturalHistoryMuseum/ckanext-dataspatial)
 [![Coveralls](https://img.shields.io/coveralls/github/NaturalHistoryMuseum/ckanext-dataspatial/master.svg?style=flat-square)](https://coveralls.io/github/NaturalHistoryMuseum/ckanext-dataspatial)
 [![CKAN](https://img.shields.io/badge/ckan-2.9.0a-orange.svg?style=flat-square)](https://github.com/ckan/ckan)
